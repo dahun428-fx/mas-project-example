@@ -5,7 +5,7 @@ from mini_mas.prompts import render
 from mini_mas.schemas import AgentResult
 
 class KnowledgeAgent:
-    name = "Knowldge"
+    name = "Knowledge"
 
     def __init__(self, llm=None):
         self.llm = llm or OpenAILLM(model="gpt-5.4-nano")
