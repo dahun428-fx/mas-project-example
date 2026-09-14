@@ -1,6 +1,6 @@
 # 진행표
 
-마지막 갱신: 2026-09-11 · 현재 위치: **Step 3 / 4교시 (실행 확인 중)**
+마지막 갱신: 2026-09-14 · 현재 위치: **Step 3 / 5교시 (LLM 분류기) 시작**
 
 ## 교시 단위 (실제 진행 기록)
 
@@ -10,8 +10,8 @@
 | 1 | OpenAI 호출 1회로 답 받는 CLI | 2 | 완료 | [01](lessons/01-openai-call.md) |
 | 2 | KnowledgeAgent + yaml 프롬프트 + AgentResult | 2 | 완료 | [02](lessons/02-first-agent.md) |
 | 3 | FakeLLM 으로 유닛 테스트 · **CP1** | 2 | 완료 | [03](lessons/03-fake-llm-tests.md) |
-| 4 | NumbersAgent(검진 컨텍스트) + ChatAgent | 3 | 진행 중 | [04](lessons/04-three-agents.md) |
-| 5 | LLM 분류기 (질문 → 에이전트 선택) | 3 | 대기 | |
+| 4 | NumbersAgent(검진 컨텍스트) + ChatAgent | 3 | 완료 | [04](lessons/04-three-agents.md) |
+| 5 | LLM 분류기 (질문 → 에이전트 선택) | 3 | 진행 중 | |
 | 6 | 오케스트레이터 연결 + 골든셋 정확도 | 3 | 대기 | |
 | 7 | 병렬 실행 (asyncio) | 4 | 대기 | |
 | 8 | 합성기 merge → refine → guard | 4 | 대기 | |

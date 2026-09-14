@@ -1,25 +1,24 @@
-import sys
-
 import argparse
 
-from mini_mas.agents.chat import ChatAgent
-from mini_mas.agents.knowledge import KnowledgeAgent
-from mini_mas.agents.numbers import NumbersAgent
-
-
-AGENTS = {
-    "numbers": NumbersAgent,
-    "knowledge": KnowledgeAgent,
-    "chat": ChatAgent,
-}
+from mini_mas.classifier import classify
+from mini_mas.router import ROUTE_MAP, resolve
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("query")
-    parser.add_argument("--agent", choices=AGENTS.keys(), default="knowledge")
+    parser.add_argument("--agent", choices=ROUTE_MAP.keys(), default="knowledge")
     args = parser.parse_args()
 
-    result = AGENTS[args.agent]().run(args.query)
+    if args.agent:
+        agent_key, reason = args.agent, "수동 지정"
+    else:
+        decision = classify(args.query)
+        agent_key, reason = decision["agent"], decision["reason"]
+        if decision.get("fallback"):
+            reason = f"분류 실패 → {agent_key} (raw: {decision['raw'][:60]})"
+
+    print(f"[분류] agent={agent_key} · {reason}\n")
+    result = resolve(agent_key).run(args.query)
     print(result.text)
     m = result.metadata
     print(f"\n[{result.name}] model={m['model']} finish={m['finish_reason']} "
