@@ -1,0 +1,87 @@
+{
+    "name": "다나아",
+    "age": 35,
+    "gender": "남",
+    "checkups": [
+        {
+            "checkup_date": "2025-11-12",
+            "result": [
+                {
+                    "da_name": "공복혈당",
+                    "user_value": 102,
+                    "unit": "mg/dL",
+                    "normal_value": "70~99",
+                    "status": "주의"
+                },
+                {
+                    "da_name": "총콜레스테롤",
+                    "user_value": 215,
+                    "unit": "mg/dL",
+                    "normal_value": "~199",
+                    "status": "주의"
+                },
+                {
+                    "da_name": "LDL콜레스테롤",
+                    "user_value": 138,
+                    "unit": "mg/dL",
+                    "normal_value": "~129",
+                    "status": "주의"
+                },
+                {
+                    "da_name": "수축기혈압",
+                    "user_value": 128,
+                    "unit": "mmHg",
+                    "normal_value": "~119",
+                    "status": "주의"
+                },
+                {
+                    "da_name": "이완기혈압",
+                    "user_value": 82,
+                    "unit": "mmHg",
+                    "normal_value": "~79",
+                    "status": "주의"
+                }
+            ]
+        },
+        {
+            "checkup_date": "2024-11-16",
+            "result": [
+                {
+                    "da_name": "공복혈당",
+                    "user_value": 96,
+                    "unit": "mg/dL",
+                    "normal_value": "70~99",
+                    "status": "정상"
+                },
+                {
+                    "da_name": "총콜레스테롤",
+                    "user_value": 198,
+                    "unit": "mg/dL",
+                    "normal_value": "~199",
+                    "status": "정상"
+                },
+                {
+                    "da_name": "LDL콜레스테롤",
+                    "user_value": 121,
+                    "unit": "mg/dL",
+                    "normal_value": "~129",
+                    "status": "정상"
+                },
+                {
+                    "da_name": "수축기혈압",
+                    "user_value": 118,
+                    "unit": "mmHg",
+                    "normal_value": "~119",
+                    "status": "정상"
+                },
+                {
+                    "da_name": "이완기혈압",
+                    "user_value": 76,
+                    "unit": "mmHg",
+                    "normal_value": "~79",
+                    "status": "정상"
+                }
+            ]
+        }
+    ]
+}
