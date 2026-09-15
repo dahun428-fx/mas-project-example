@@ -1,0 +1,21 @@
+
+{"id": 1, "query": "작년 공복혈당 어땠어?", "agent": "numbers"}
+{"id": 2, "query": "내 콜레스테롤 정상이야?", "agent": "numbers"}
+{"id": 3, "query": "혈압 추이 알려줘", "agent": "numbers"}
+{"id": 4, "query": "2025년 검진에서 주의 판정 받은 거 뭐 있어?", "agent": "numbers"}
+{"id": 5, "query": "LDL이 작년보다 올랐어?", "agent": "numbers"}
+{"id": 6, "query": "제 이완기혈압 수치 알려주세요", "agent": "numbers"}
+{"id": 7, "query": "지난번 검진 결과 요약해줘", "agent": "numbers"}
+{"id": 8, "query": "공복혈당이 뭐야?", "agent": "knowledge"}
+{"id": 9, "query": "LDL 정상 범위는?", "agent": "knowledge"}
+{"id": 10, "query": "혈압 낮추려면 어떻게 해야 해?", "agent": "knowledge"}
+{"id": 11, "query": "총콜레스테롤과 LDL 차이가 뭐야?", "agent": "knowledge"}
+{"id": 12, "query": "공복혈당 검사 전에 몇 시간 굶어야 해?", "agent": "knowledge"}
+{"id": 13, "query": "당뇨 전단계 기준이 뭐야?", "agent": "knowledge"}
+{"id": 14, "query": "고지혈증에 좋은 음식은?", "agent": "knowledge"}
+{"id": 15, "query": "안녕", "agent": "chat"}
+{"id": 16, "query": "고마워요", "agent": "chat"}
+{"id": 17, "query": "오늘 날씨 어때?", "agent": "chat"}
+{"id": 18, "query": "파이썬 코드 짜줘", "agent": "chat"}
+{"id": 19, "query": "넌 누구야?", "agent": "chat"}
+{"id": 20, "query": "ㅋㅋㅋ", "agent": "chat"}
