@@ -28,3 +28,16 @@ def test_garbage_falls_back_to_chat():
 
 def test_parse_json_returns_none_on_broken_json():
     assert parse_json('{"agent": "numbers", ') is None
+
+def test_two_agents_kept_in_order():
+    d = classify("q", llm=FakeLLM(text='{"agents": ["numbers", "knowledge"], "reason": "섞인 질문"}'))
+    assert d["agents"] == ["numbers", "knowledge"]
+    assert d["agent"] == "numbers"
+
+def test_chat_removed_when_mixed():
+    d = classify("q", llm=FakeLLM(text='{"agents": ["chat", "knowledge"]}'))
+    assert d["agents"] == ["knowledge"]
+
+def test_duplicates_removed_and_max_two():
+    d = classify("q", llm=FakeLLM(text='{"agents": ["numbers", "numbers", "knowledge", "chat"]}'))
+    assert d["agents"] == ["numbers", "knowledge"]
