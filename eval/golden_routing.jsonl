@@ -19,3 +19,14 @@
 {"id": 18, "query": "파이썬 코드 짜줘", "agent": "chat"}
 {"id": 19, "query": "넌 누구야?", "agent": "chat"}
 {"id": 20, "query": "ㅋㅋㅋ", "agent": "chat"}
+{"id": 21, "query": "공복혈당 102면 높은 거야?", "agent": "knowledge"}
+{"id": 22, "query": "LDL 138이면 위험한 수준이야?", "agent": "knowledge"}
+{"id": 23, "query": "검진에서 뭐가 제일 안 좋았어?", "agent": "numbers"}
+{"id": 24, "query": "혈당 수치 두 해 비교해줘", "agent": "numbers"}
+{"id": 25, "query": "혈압 때문에 짜증나 ㅠㅠ", "agent": "chat"}
+{"id": 26, "query": "콜레스테롤 얘기 그만하고 싶다", "agent": "chat"}
+{"id": 27, "query": "콜레스테롤", "agent": "knowledge"}
+{"id": 28, "query": "혈압", "agent": "knowledge"}
+{"id": 29, "query": "내 LDL 높은데 뭘 먹어야 돼?", "agent": "numbers"}
+{"id": 30, "query": "제 공복혈당 괜찮으면 운동은 뭐가 좋아요?", "agent": "numbers"}
+

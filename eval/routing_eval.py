@@ -5,12 +5,18 @@ from pathlib import Path
 
 from mini_mas.classifier import classify
 
-
+VALID_AGENTS = {"numbers", "knowledge", "chat"}
 GOLDEN = Path(__file__).parent / "golden_routing.jsonl"
 
 def load_golden(path: Path = GOLDEN) -> list[dict]:
     with open(path, encoding="utf-8") as f:
-        return [json.loads(line) for line in f if line.strip()]
+        items = [json.loads(line) for line in f if line.strip()]
+    for item in items:
+        if item["agent"] not in VALID_AGENTS:
+            raise ValueError(f"골든셋 #{item['id']} 의 정답 {item['agent']!r} 가 잘못됐습니다. {VALID_AGENTS} 중 하나여야 합니다.")
+        if "(" in item["query"] and "유형" in item["query"]:
+            raise ValueError(f"골든셋 #{item['id']} 의 질문이 아직 안내 문구입니다: {item['query']!r}")
+    return items
 
 def main():
     items = load_golden()
@@ -42,6 +48,6 @@ def main():
         print("\n틀린 문항:")
         for wid, q, truth, pred, reason in wrong:
             print(f"  #{wid} {q!r}  정답={truth} 예측={pred}  ({reason})")
-            
+
 if __name__ == "__main__":
     main()

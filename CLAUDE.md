@@ -30,11 +30,15 @@
 
 ```
 mini_mas/llm.py            OpenAILLM.invoke(system, user, max_tokens) -> LLMResponse
-mini_mas/schemas.py        AgentResult(name, text, docs, metadata)
-mini_mas/prompts/          render(name, **slots) -> (system, user); *.yaml
+mini_mas/schemas.py        AgentResult(name, text, docs, metadata), TurnResult(query, agent, reason, fallback, result, classify_ms, total_ms)
+mini_mas/prompts/          render(name, **slots) -> (system, user); knowledge / numbers / chat / classifier .yaml
 mini_mas/context.py        load_checkup(), build_checkup_context(data) -> str
-mini_mas/agents/           KnowledgeAgent, NumbersAgent, ChatAgent  (run(query) -> AgentResult)
-mini_mas/ask.py            CLI: python -m mini_mas.ask --agent numbers "질문"
+mini_mas/agents/           KnowledgeAgent, NumbersAgent, ChatAgent  (name: Knowledge/Numbers/Chat, run(query) -> AgentResult)
+mini_mas/router.py         ROUTE_MAP, FALLBACK_AGENT="chat", resolve(key, llm=None)
+mini_mas/classifier.py     parse_json(text), classify(query, llm=None) -> {agent, reason, fallback, raw}
+mini_mas/orchestrator.py   Orchestrator(classifier_llm, agent_llm).run(query, force_agent=None) -> TurnResult
+mini_mas/ask.py            CLI: python -m mini_mas.ask "질문" [--agent numbers]
 data/sample_checkup.json   가상 사용자 2년치 검진 5항목
-tests/unit/                conftest.FakeLLM + 에이전트 테스트
+eval/golden_routing.jsonl  라우팅 골든셋 30문항;  python -m eval.routing_eval
+tests/unit/                conftest.FakeLLM + 에이전트/분류기/오케스트레이터 테스트 (14개)
 ```
