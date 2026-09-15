@@ -6,7 +6,7 @@ from mini_mas.prompts import render
 from mini_mas.schemas import AgentResult
 
 class NumbersAgent:
-    name = "NumbersAgent"
+    name = "Numbers"
 
     def __init__(self, llm=None, data=None):
         self.llm = llm or OpenAILLM("gpt-5.4-nano")

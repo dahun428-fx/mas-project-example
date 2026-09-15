@@ -10,5 +10,5 @@ ROUTE_MAP = {
 
 FALLBACK_AGENT = "chat"
 
-def resolve(agent_key : str) :
-    return ROUTE_MAP[agent_key]()
+def resolve(agent_key : str, llm=None) :
+    return ROUTE_MAP[agent_key](llm=llm)
