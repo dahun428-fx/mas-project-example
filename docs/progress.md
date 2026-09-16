@@ -1,6 +1,6 @@
 # 진행표
 
-마지막 갱신: 2026-09-15 · 현재 위치: **Step 4 / 7교시 (병렬 실행) 대기**
+마지막 갱신: 2026-09-16 · 현재 위치: **Step 4 / 8교시 (합성기) 시작**
 
 ## 교시 단위 (실제 진행 기록)
 
@@ -13,8 +13,8 @@
 | 4 | NumbersAgent(검진 컨텍스트) + ChatAgent | 3 | 완료 | [04](lessons/04-three-agents.md) |
 | 5 | LLM 분류기 (질문 → 에이전트 선택) | 3 | 완료 | [05](lessons/05-classifier.md) |
 | 6 | 오케스트레이터 연결 + 골든셋 정확도 | 3 | 완료 (30문항 96.7~100%) | [06](lessons/06-orchestrator-golden-set.md) |
-| 7 | 병렬 실행 (asyncio) | 4 | 대기 | |
-| 8 | 합성기 merge → refine → guard | 4 | 대기 | |
+| 7 | 병렬 실행 (asyncio) | 4 | 완료 | [07](lessons/07-parallel-agents.md) |
+| 8 | 합성기 merge → refine → guard | 4 | 진행 중 | |
 | 9 | FastAPI SSE 스트리밍 · **CP2** | 5 | 대기 | |
 | … | Step 6~12 는 Doc 20 참조 | | | |
 
