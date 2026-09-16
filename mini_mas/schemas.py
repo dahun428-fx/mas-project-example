@@ -10,10 +10,11 @@ class AgentResult:
 @dataclass
 class TurnResult:
     query: str
-    agent: str
+    agents: list[str]
     reason: str
     fallback: bool
-    result: AgentResult
+    results: list[AgentResult]
+    errors: dict[str, str]
     classify_ms: float
+    agents_ms: float
     total_ms: float
-
