@@ -15,6 +15,9 @@ class TurnResult:
     fallback: bool
     results: list[AgentResult]
     errors: dict[str, str]
+    final_text: str
+    refined: bool
     classify_ms: float
     agents_ms: float
+    synth_ms: float
     total_ms: float

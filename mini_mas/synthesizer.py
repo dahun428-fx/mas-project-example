@@ -1,5 +1,7 @@
 
 import re
+from mini_mas.llm import OpenAILLM
+from mini_mas.prompts import render
 
 BLOCK_ORDER = ("personal_numbers", "general", "recommendations")
 
@@ -33,3 +35,18 @@ def guard(text: str) -> str:
     text = _soften_assertions(text)
     text = re.sub(r"\n{3,}", "\n\n", text).strip()
     return text or EMPTY_ANSWER
+
+def refine(merged:str, query:str, llm=None) -> str:
+    llm = llm or OpenAILLM("gpt-5.4-nano")
+    system, user = render("refine", merged=merged, query=query)
+    try: 
+        resp = llm.invoke(system=system, user=user, max_tokens=600)
+    except Exception:
+        return merged
+    return resp.text.strip() or merged
+
+def synthesize(results: list, query:str, llm=None) -> tuple[str, bool]:
+    merged = merge(results)
+    if len(results) < 2:
+        return guard(merged), False
+    return guard(refine(merged, query=query, llm=llm)), True

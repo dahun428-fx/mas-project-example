@@ -35,3 +35,44 @@ def test_guard_softens_assertions():
 
 def test_guard_returns_message_on_empty():
     assert guard("   ") == EMPTY_ANSWER
+
+
+from mini_mas.synthesizer import synthesize
+from tests.unit.conftest import FakeLLM
+
+
+def test_single_result_skips_llm():
+    llm = FakeLLM(text="다듬은 답")
+    text, refined = synthesize([_result("Numbers", "원문 그대로", "personal_numbers")], "q", llm=llm)
+    assert text == "원문 그대로"
+    assert refined is False
+    assert len(llm.calls) == 0
+
+
+def test_two_results_call_llm_once():
+    llm = FakeLLM(text="합쳐진 답입니다.")
+    results = [
+        _result("Numbers", "LDL 138", "personal_numbers"),
+        _result("Knowledge", "포화지방을 줄이세요", "general"),
+    ]
+    text, refined = synthesize(results, "q", llm=llm)
+    assert text == "합쳐진 답입니다."
+    assert refined is True
+    assert len(llm.calls) == 1
+    assert "LDL 138" in llm.calls[0]["user"]
+
+
+def test_refine_failure_falls_back_to_merged():
+    llm = FakeLLM(error=RuntimeError("합성 LLM 다운"))
+    results = [
+        _result("Numbers", "LDL 138", "personal_numbers"),
+        _result("Knowledge", "포화지방을 줄이세요", "general"),
+    ]
+    text, _ = synthesize(results, "q", llm=llm)
+    assert "LDL 138" in text and "포화지방" in text
+
+
+def test_no_results_returns_message():
+    text, refined = synthesize([], "q", llm=FakeLLM())
+    assert text == EMPTY_ANSWER
+    assert refined is False

@@ -58,3 +58,25 @@ def test_all_agents_fail():
     turn = Orchestrator(classifier_llm=FakeLLM(text=TWO_AGENTS), agent_llm=broken).run("q")
     assert turn.results == []
     assert set(turn.errors) == {"numbers", "knowledge"}
+
+
+def test_final_text_is_synthesized_for_two_agents():
+    turn = Orchestrator(
+        classifier_llm=FakeLLM(text=TWO_AGENTS),
+        agent_llm=FakeLLM(text="담당 답"),
+        synth_llm=FakeLLM(text="합쳐진 최종 답"),
+    ).run("내 LDL 높은데 뭘 먹어야 돼?")
+    assert turn.final_text == "합쳐진 최종 답"
+    assert turn.refined is True
+
+
+def test_single_agent_final_text_skips_synth_llm():
+    synth = FakeLLM(text="쓰이면 안 됨")
+    turn = Orchestrator(
+        classifier_llm=FakeLLM(text='{"agents": ["chat"]}'),
+        agent_llm=FakeLLM(text="안녕하세요"),
+        synth_llm=synth,
+    ).run("안녕")
+    assert turn.final_text == "안녕하세요"
+    assert turn.refined is False
+    assert len(synth.calls) == 0

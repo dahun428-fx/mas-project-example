@@ -1,6 +1,7 @@
 import time
 import asyncio
 
+from mini_mas.synthesizer import synthesize
 from mini_mas.classifier import classify
 from mini_mas.router import resolve
 from mini_mas.schemas import TurnResult
@@ -8,10 +9,11 @@ from mini_mas.schemas import TurnResult
 AGENT_TIMEOUT_S = 30
 
 class Orchestrator:
-    def __init__(self, classifier_llm=None, agent_llm=None, agent_llms=None, timeout_s=AGENT_TIMEOUT_S):
+    def __init__(self, classifier_llm=None, agent_llm=None, agent_llms=None, synth_llm=None, timeout_s=AGENT_TIMEOUT_S):
         self.classifier_llm = classifier_llm
         self.agent_llm = agent_llm
         self.agent_llms = agent_llms or {}
+        self.synth_llm = synth_llm
         self.timeout_s = timeout_s
 
     def run(self, query: str, force_agents: list[str] | None = None) -> TurnResult:
@@ -41,6 +43,10 @@ class Orchestrator:
             else:
                 results.append(result)
 
+        t2 = time.perf_counter()
+        final_text, refined = await asyncio.to_thread(synthesize, results, query, self.synth_llm)
+        synth_ms = (time.perf_counter() - t2) * 1000
+
         return TurnResult(
             query=query,
             agents=decision["agents"],
@@ -48,8 +54,11 @@ class Orchestrator:
             fallback=decision["fallback"],
             results=results,
             errors=errors,
+            final_text=final_text,
+            refined=refined,
             classify_ms=classify_ms,
             agents_ms=agents_ms,
+            synth_ms=synth_ms,
             total_ms=(time.perf_counter() - t0) * 1000,
         )
     async def _run_one(self, key:str, query:str):
