@@ -48,3 +48,22 @@ def no_network_embed(monkeypatch):
         return [[1.0] + [0.0] * (rag.EMBED_DIM - 1) for _ in texts]
 
     monkeypatch.setattr(rag, "embed", fake_embed)
+
+
+@pytest.fixture(autouse=True)
+def no_network_llm(monkeypatch):
+    """유닛 테스트에서 실제 LLM 호출을 막는다.
+
+    LLM 을 주입하지 않은 코드 경로가 있으면 조용히 진짜 API 를 부르고 돈이 나간다.
+    (실제로 orchestrator 테스트가 synth_llm 을 안 넘겨 합성기가 OpenAI 를 호출하고 있었다.)
+    여기서 막아 두면 그런 경로가 테스트에서 바로 드러난다.
+    """
+    from mini_mas.llm import OpenAILLM
+
+    def blocked(self, *args, **kwargs):
+        raise RuntimeError(
+            f"유닛 테스트에서 실제 LLM 을 호출했습니다 (model={self.model}, agent={self.agent}). "
+            "가짜 LLM 을 주입하세요."
+        )
+
+    monkeypatch.setattr(OpenAILLM, "invoke", blocked)

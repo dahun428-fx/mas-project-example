@@ -1,3 +1,4 @@
+import itertools
 import queue
 import sqlite3
 import threading
@@ -8,7 +9,10 @@ from pathlib import Path
 DB_PATH = Path(__file__).parent.parent / "log" / "traces.db"
 
 _trace_id: ContextVar[str | None] = ContextVar("trace_id", default=None)
-_seq: ContextVar[int] = ContextVar("seq", default=0)
+# 숫자가 아니라 카운터 "객체" 를 담는다.
+# asyncio.to_thread 는 컨텍스트를 복사하므로, 숫자를 넣으면 스레드 안의 set() 이 부모에 반영되지 않아
+# 담당마다 seq 가 1 부터 다시 시작한다. 객체를 넣으면 사본들이 같은 객체를 가리켜 번호가 이어진다.
+_seq: ContextVar[itertools.count | None] = ContextVar("seq", default=None)
 
 PRICES = {
     "gpt-5.4-nano": (0.0000001, 0.0000004),
@@ -19,7 +23,7 @@ PRICES = {
 def new_trace(query: str = "") -> str:
     trace_id = uuid.uuid4().hex[:12]
     _trace_id.set(trace_id)
-    _seq.set(0)
+    _seq.set(itertools.count(1))
     return trace_id
 
 def get_trace_id() -> str | None:
@@ -30,8 +34,8 @@ def compute_cost(model: str, input_tokens: int, output_tokens: int) -> float:
     return input_tokens * price_in + output_tokens * price_out
 
 def record(*, model, agent, input_tokens=0, output_tokens=0, latency_ms=0.0, finish_reason="stop", error=None, query="", response=""):
-    seq = _seq.get() + 1
-    _seq.set(seq)
+    counter = _seq.get()
+    seq = next(counter) if counter is not None else 0
     row = {
         "trace_id": _trace_id.get() or "-",
         "seq": seq,

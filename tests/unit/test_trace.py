@@ -32,12 +32,36 @@ def test_unknown_model_costs_zero():
     assert trace.compute_cost("gpt-9-ultra", 1_000_000, 1_000_000) == 0.0
 
 
-def test_new_trace_resets_seq():
+def test_new_trace_resets_seq(temp_db):
+    # temp_db 를 반드시 받는다. 안 받으면 이 테스트가 진짜 log/traces.db 를 더럽힌다.
     first = trace.new_trace("q1")
     trace.record(model="gpt-5.4-nano", agent="A")
     second = trace.new_trace("q2")
+    trace.record(model="gpt-5.4-nano", agent="B")
+    trace.flush()
+
     assert first != second
     assert trace.get_trace_id() == second
+    assert [(r[0], r[1]) for r in rows(temp_db)] == [(first, 1), (second, 1)]
+
+
+def test_seq_increases_across_threads(temp_db):
+    """asyncio.to_thread 로 갈라져도 seq 가 이어진다 (카운터 객체 공유)."""
+    import asyncio
+
+    async def main():
+        trace.new_trace("q")
+        await asyncio.gather(
+            asyncio.to_thread(trace.record, model="gpt-5.4-nano", agent="A"),
+            asyncio.to_thread(trace.record, model="gpt-5.4-nano", agent="B"),
+        )
+        await asyncio.to_thread(trace.record, model="gpt-5.4-nano", agent="C")
+
+    asyncio.run(main())
+    trace.flush()
+
+    seqs = sorted(r[1] for r in rows(temp_db))
+    assert seqs == [1, 2, 3]
 
 
 def test_records_are_written(temp_db):

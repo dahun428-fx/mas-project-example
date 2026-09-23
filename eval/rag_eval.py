@@ -1,6 +1,7 @@
 
 
 from mini_mas.rag import Retriever
+from mini_mas.trace import flush, new_trace
 
 CASES = [
     ("공복혈당 정상 범위는?", "K01"),
@@ -25,6 +26,7 @@ def main():
     misses = []
 
     for query, expected in CASES:
+        new_trace(query)  # 질의 1건 = trace 1건. 안 하면 전부 "-" 로 뭉친다
         hits = retriever.search(query)
         ids = [h["id"] for h in hits]
 
@@ -56,3 +58,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    flush()  # 데몬 스레드라 프로그램이 먼저 끝나면 기록이 날아간다
