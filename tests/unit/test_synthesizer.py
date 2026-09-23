@@ -1,6 +1,7 @@
 
 from mini_mas.schemas import AgentResult
-from mini_mas.synthesizer import EMPTY_ANSWER, guard, merge
+from mini_mas.synthesizer import EMPTY_ANSWER, guard, merge, synthesize
+from tests.unit.conftest import FakeLLM
 
 
 def _result(name, text, block_type):
@@ -35,10 +36,6 @@ def test_guard_softens_assertions():
 
 def test_guard_returns_message_on_empty():
     assert guard("   ") == EMPTY_ANSWER
-
-
-from mini_mas.synthesizer import synthesize
-from tests.unit.conftest import FakeLLM
 
 
 def test_single_result_skips_llm():

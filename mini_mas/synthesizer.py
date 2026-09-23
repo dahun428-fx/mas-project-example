@@ -1,5 +1,6 @@
 
 import re
+
 from mini_mas.llm import OpenAILLM
 from mini_mas.prompts import render
 
@@ -39,7 +40,7 @@ def guard(text: str) -> str:
 def refine(merged:str, query:str, llm=None) -> str:
     llm = llm or OpenAILLM("gpt-5.4-nano")
     system, user = render("refine", merged=merged, query=query)
-    try: 
+    try:
         resp = llm.invoke(system=system, user=user, max_tokens=600)
     except Exception:
         return merged

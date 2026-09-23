@@ -2,6 +2,7 @@ from mini_mas.llm import OpenAILLM
 from mini_mas.prompts import render
 from mini_mas.schemas import AgentResult
 
+
 class ChatAgent:
     name = "Chat"
 

@@ -1,7 +1,7 @@
 
 from mini_mas.agents.chat import ChatAgent
 from mini_mas.agents.numbers import NumbersAgent
-from mini_mas.context import build_checkup_context, load_checkup
+from mini_mas.context import build_checkup_context, filter_checkups, load_checkup
 
 
 def test_context_contains_values_and_dates():
@@ -15,10 +15,44 @@ def test_numbers_agent_puts_context_into_prompt(fake_llm):
     result = NumbersAgent(llm=fake_llm).run("작년 공복혈당 어땠어?")
     assert result.metadata["block_type"] == "personal_numbers"
     user_prompt = fake_llm.calls[0]["user"]
-    assert "공복혈당: 96 mg/dL" in user_prompt
+    # "작년" 은 10교시부터 2025 로 해석된다 → 2025 검진값(102)만 프롬프트에 들어간다
+    assert "공복혈당: 102 mg/dL" in user_prompt
     assert "작년 공복혈당 어땠어?" in user_prompt
 
 
 def test_chat_agent_is_short(fake_llm):
     ChatAgent(llm=fake_llm).run("안녕")
     assert fake_llm.calls[0]["max_tokens"] == 128
+
+
+def test_filter_keeps_only_requested_year():
+    data = load_checkup()
+    matched, missing = filter_checkups(data, ["2024"])
+    assert [c["checkup_date"] for c in matched] == ["2024-11-16"]
+    assert missing == []
+
+
+def test_filter_reports_missing_year():
+    matched, missing = filter_checkups(load_checkup(), ["2020"])
+    assert matched == [] and missing == ["2020"]
+
+
+def test_context_lists_available_years():
+    text = build_checkup_context(load_checkup(), ["2024"])
+    assert "보유 검진 연도: 2025, 2024" in text
+    assert "2025-11-12" not in text
+
+
+def test_context_marks_missing_year():
+    text = build_checkup_context(load_checkup(), ["2020"])
+    assert "[없음] 요청한 연도 2020" in text
+
+
+def test_numbers_agent_filters_by_year(fake_llm):
+    from mini_mas.agents.numbers import NumbersAgent
+
+    result = NumbersAgent(llm=fake_llm).run("2024년 공복혈당 어땠어?")
+    assert result.metadata["years"] == ["2024"]
+    prompt = fake_llm.calls[0]["user"]
+    assert "96 mg/dL" in prompt
+    assert "102 mg/dL" not in prompt

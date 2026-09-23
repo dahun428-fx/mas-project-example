@@ -1,0 +1,78 @@
+
+import json
+import math
+import os
+import sys
+from pathlib import Path
+
+from dotenv import load_dotenv
+from pathlib import Path
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+DOCS_PATH = Path(__file__).parent.parent / "data" / "knowledge.jsonl"
+INDEX_PATH = Path(__file__).parent.parent / "data" / "knowledge_index.json"
+
+EMBED_MODEL = "text-embedding-3-small"
+EMBED_DIM = 256
+TOP_K = 3
+THRESHOLD = 0.35
+
+def embed(texts: list[str]) -> list[list[float]]:
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    resp = client.embeddings.create(model=EMBED_MODEL, input=texts, dimensions=EMBED_DIM)
+    return [item.embedding for item in resp.data]
+
+def cosine(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a,b))
+    na = math.sqrt(sum(x * x for x in a))
+    nb = math.sqrt(sum(y * y for y in b))
+    if na == 0 or nb == 0:
+        return 0.0
+    return dot / (na * nb)
+
+def load_docs(path: Path = DOCS_PATH) -> list[dict]:
+    with open(path, encoding="utf-8") as f:
+        return [json.loads(line) for line in f if line.strip()]
+
+def build_index(docs_path: Path = DOCS_PATH, index_path: Path = INDEX_PATH) -> int:
+    docs = load_docs(docs_path)
+    vectors = embed([f"{d['title']}\n{d['text']}" for d in docs])
+    for doc, vector in zip(docs, vectors):
+        doc["embedding"] = vector
+    with open(index_path, "w", encoding="utf-8") as f:
+        json.dump(docs, f, ensure_ascii=False)
+    return len(docs)
+
+class Retriever:
+    def __init__(self, index_path: Path = INDEX_PATH, embed_fn=None, index=None):
+        self.embed_fn = embed_fn or embed
+        if index is not None:
+            self.index = index
+        else:
+            with open(index_path, encoding="utf-8") as f:
+                self.index = json.load(f)
+
+    def search(self, query: str, k: int = TOP_K, threshold: float = THRESHOLD) -> list[dict]:
+        query_vector = self.embed_fn([query])[0]
+
+        scored = []
+        for doc in self.index:
+            score = cosine(query_vector, doc["embedding"])
+            if score >= threshold:
+                scored.append({"id": doc["id"], "title":doc["title"], "text":doc["text"], "source": doc["source"], "score": round(score, 3)})
+
+        scored.sort(key=lambda d: d["score"], reverse=True)
+        return scored[:k]
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "build":
+        count = build_index()
+        print(f"인덱스 생성 완료 : {count}건 -> {INDEX_PATH}")
+    else:
+        query = " ".join(sys.argv[1:]) or "LDL 기준이 뭐야 ?"
+        for hit in Retriever().search(query):
+            print(f"{hit['score']:.3f}  [{hit['id']}] {hit['title']} — {hit['text'][:40]}...")

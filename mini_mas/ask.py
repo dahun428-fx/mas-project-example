@@ -3,6 +3,7 @@ import argparse
 from mini_mas.orchestrator import Orchestrator
 from mini_mas.router import ROUTE_MAP
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("query")

@@ -1,7 +1,9 @@
 import time
+
 import pytest
 
 from mini_mas.llm import LLMResponse
+
 
 class FakeLLM:
     def __init__(self, text="가짜 답변입니다.", delay=0.0, error=None):
