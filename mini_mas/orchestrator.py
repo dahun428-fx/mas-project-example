@@ -5,6 +5,7 @@ from mini_mas.classifier import classify
 from mini_mas.router import resolve
 from mini_mas.schemas import TurnResult
 from mini_mas.synthesizer import synthesize
+from mini_mas.trace import new_trace
 
 AGENT_TIMEOUT_S = 30
 
@@ -28,7 +29,7 @@ class Orchestrator:
 
     async def astream(self, query:str, force_agents: list[str] | None = None) :
         t0 = time.perf_counter()
-
+        trace_id = new_trace(query)
         def ms() -> float:
             return (time.perf_counter() - t0) * 1000
 
@@ -83,7 +84,7 @@ class Orchestrator:
             total_ms=ms(),
         )
         yield {"event": "result", "data": {"text": final_text, "refined": refined}}
-        yield {"event": "status", "data": {"code": "0000" if results else "9999", "total_ms": round(turn.total_ms)}}
+        yield {"event": "status", "data": {"code": "0000" if results else "9999", "total_ms": round(turn.total_ms), "trace_id": trace_id}}
         yield {"event": "done", "data": turn}
 
     async def _run_one(self, key: str, query: str):

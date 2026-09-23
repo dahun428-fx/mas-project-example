@@ -2,6 +2,7 @@ import argparse
 
 from mini_mas.orchestrator import Orchestrator
 from mini_mas.router import ROUTE_MAP
+from mini_mas.trace import flush
 
 
 def main():
@@ -30,6 +31,7 @@ def main():
         print(f"── {key} 실패: {error}\n")
 
     print(f"total={turn.total_ms:.0f}ms")
+    flush()
 
 if __name__ == "__main__":
     main()

@@ -31,7 +31,7 @@ def normalize_agents(raw) -> list[str]:
     return agents[:MAX_AGENTS]
 
 def classify(query: str, llm=None) -> dict:
-    llm = llm or OpenAILLM("gpt-5.4-nano")
+    llm = llm or OpenAILLM("gpt-5.4-nano", agent="Classifier")
     system, user = render("classifier", query=query)
     resp = llm.invoke(system=system, user=user, max_tokens=128)
     parsed = parse_json(resp.text)

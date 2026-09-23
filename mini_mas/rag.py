@@ -3,13 +3,13 @@ import json
 import math
 import os
 import sys
-from pathlib import Path
-
-from dotenv import load_dotenv
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI
+
+from mini_mas.trace import record
 
 load_dotenv()
 
@@ -23,7 +23,15 @@ THRESHOLD = 0.35
 
 def embed(texts: list[str]) -> list[list[float]]:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    t0 = time.perf_counter()
     resp = client.embeddings.create(model=EMBED_MODEL, input=texts, dimensions=EMBED_DIM)
+    record(
+        model=EMBED_MODEL,
+        agent="RAG",
+        input_tokens=resp.usage.prompt_tokens,
+        latency_ms=(time.perf_counter() - t0) * 1000,
+        query=texts[0][:200],
+    )
     return [item.embedding for item in resp.data]
 
 def cosine(a: list[float], b: list[float]) -> float:
@@ -52,11 +60,18 @@ class Retriever:
         self.embed_fn = embed_fn or embed
         if index is not None:
             self.index = index
-        else:
+        elif index_path.exists():
             with open(index_path, encoding="utf-8") as f:
                 self.index = json.load(f)
+        else:
+            # 인덱스가 없으면 검색 없이 동작한다 (근거 없이 답하게 두고, 빌드를 안내)
+            print(f"[rag] 인덱스가 없습니다: {index_path}. `python -m mini_mas.rag build` 로 생성하세요.")
+            self.index = []
 
     def search(self, query: str, k: int = TOP_K, threshold: float = THRESHOLD) -> list[dict]:
+        if not self.index:
+            return []
+
         query_vector = self.embed_fn([query])[0]
 
         scored = []

@@ -7,7 +7,7 @@ class ChatAgent:
     name = "Chat"
 
     def __init__(self, llm=None):
-        self.llm = llm or OpenAILLM("gpt-5.4-nano")
+        self.llm = llm or OpenAILLM("gpt-5.4-nano", agent="Chat")
     def run(self, query:str) -> AgentResult:
         system, user = render("chat", query=query)
         resp = self.llm.invoke(system=system, user=user, max_tokens=128)

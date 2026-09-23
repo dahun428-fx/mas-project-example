@@ -12,7 +12,7 @@ class NumbersAgent:
     name = "Numbers"
 
     def __init__(self, llm=None, data=None):
-        self.llm = llm or OpenAILLM("gpt-5.4-nano")
+        self.llm = llm or OpenAILLM("gpt-5.4-nano", agent="Numbers")
         self.data = data or load_checkup()
 
     def run(self, query:str) -> AgentResult:

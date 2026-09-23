@@ -29,16 +29,24 @@
 ## 현재 코드 구조 요약 (교시가 진행되면 lessons 파일이 최신)
 
 ```
-mini_mas/llm.py            OpenAILLM.invoke(system, user, max_tokens) -> LLMResponse
-mini_mas/schemas.py        AgentResult(name, text, docs, metadata), TurnResult(query, agent, reason, fallback, result, classify_ms, total_ms)
-mini_mas/prompts/          render(name, **slots) -> (system, user); knowledge / numbers / chat / classifier .yaml
-mini_mas/context.py        load_checkup(), build_checkup_context(data) -> str
-mini_mas/agents/           KnowledgeAgent, NumbersAgent, ChatAgent  (name: Knowledge/Numbers/Chat, run(query) -> AgentResult)
+mini_mas/llm.py            OpenAILLM(model, agent).invoke(system, user, max_tokens) -> LLMResponse  (+ trace.record)
+mini_mas/schemas.py        AgentResult(name, text, docs, metadata), TurnResult(agents, results, errors, final_text, refined, 시간 4종)
+mini_mas/prompts/          render(name, **slots); knowledge / numbers / chat / classifier / refine .yaml
+mini_mas/context.py        load_checkup, available_years, filter_checkups, build_checkup_context(data, years)
+mini_mas/year.py           resolve_years(query, today) -> ["2025"] | ["ALL"] | []
+mini_mas/guard.py          guard_years(text, allowed) -> (text, unknown)   환각 가드
+mini_mas/rag.py            embed, cosine, build_index, Retriever(index_path, embed_fn, index).search(q, k, threshold)
+mini_mas/agents/           KnowledgeAgent(+RAG), NumbersAgent(+연도·가드), ChatAgent
 mini_mas/router.py         ROUTE_MAP, FALLBACK_AGENT="chat", resolve(key, llm=None)
-mini_mas/classifier.py     parse_json(text), classify(query, llm=None) -> {agent, reason, fallback, raw}
-mini_mas/orchestrator.py   Orchestrator(classifier_llm, agent_llm).run(query, force_agent=None) -> TurnResult
-mini_mas/ask.py            CLI: python -m mini_mas.ask "질문" [--agent numbers]
-data/sample_checkup.json   가상 사용자 2년치 검진 5항목
-eval/golden_routing.jsonl  라우팅 골든셋 30문항;  python -m eval.routing_eval
-tests/unit/                conftest.FakeLLM + 에이전트/분류기/오케스트레이터 테스트 (14개)
+mini_mas/classifier.py     classify(query, llm) -> {agent, agents(최대2), reason, fallback, raw}
+mini_mas/synthesizer.py    merge -> refine(2개 이상일 때만) -> guard ; synthesize() -> (final_text, refined)
+mini_mas/orchestrator.py   astream(이벤트 제너레이터) / arun(TurnResult) / run(동기 입구)
+mini_mas/events.py         sse_event(name, data)
+mini_mas/server.py         FastAPI: GET /api/health, GET /, POST /api/chat (SSE)
+mini_mas/trace.py          ContextVar trace_id + 큐/워커 스레드 -> log/traces.db, PRICES, flush()
+mini_mas/ask.py            CLI: python -m mini_mas.ask "질문" [--agent x] [--raw]
+data/                      sample_checkup.json, knowledge.jsonl (+ knowledge_index.json 은 생성물)
+eval/                      routing_eval(골든셋 30), parallel_bench, rag_eval, trace_report
+tests/unit/                71개. conftest: FakeLLM, no_network_embed(autouse)
+frontend/index.html        SSE 진행 표시 화면
 ```

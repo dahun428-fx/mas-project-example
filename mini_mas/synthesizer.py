@@ -38,7 +38,7 @@ def guard(text: str) -> str:
     return text or EMPTY_ANSWER
 
 def refine(merged:str, query:str, llm=None) -> str:
-    llm = llm or OpenAILLM("gpt-5.4-nano")
+    llm = llm or OpenAILLM("gpt-5.4-nano", agent="Synthesizer")
     system, user = render("refine", merged=merged, query=query)
     try:
         resp = llm.invoke(system=system, user=user, max_tokens=600)

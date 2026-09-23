@@ -51,11 +51,11 @@ def test_agent_puts_reference_into_prompt(fake_llm):
 
 
 def test_agent_without_hits_has_no_reference_block():
-    r = Retriever(index=FAKE_INDEX, embed_fn=fake_embed_for([1.0, 0.0]))
+    # 두 문서와 모두 반대 방향인 질문 벡터 → cosine 이 음수라 threshold 에서 전부 잘린다
+    r = Retriever(index=FAKE_INDEX, embed_fn=fake_embed_for([-1.0, -1.0]))
     llm = FakeLLM()
-    result = KnowledgeAgent(llm=llm, retriever=r).run("q")
-    # threshold 0.35 보다 낮은 문서는 제외 → K01 만 남지만, 아래는 전부 제외되는 경우
-    r2 = Retriever(index=FAKE_INDEX, embed_fn=fake_embed_for([0.71, 0.71]))
-    result2 = KnowledgeAgent(llm=llm, retriever=r2).run("q")
-    assert result.metadata["used_rag"] is True
-    assert result2.docs == []
+    result = KnowledgeAgent(llm=llm, retriever=r).run("오늘 점심 뭐 먹지")
+
+    assert result.docs == []
+    assert result.metadata["used_rag"] is False
+    assert "[참고 자료]" not in llm.calls[0]["user"]
